@@ -604,3 +604,128 @@ async function testSiteAvailability(apiUrl) {
         return false;
     }
 }
+// 在现有的 api.js 中添加统计相关功能
+
+class StatsAPI {
+    constructor() {
+        this.baseUrl = '/api/v1/stats';
+        this.sessionId = this.generateSessionId();
+        this.heartbeatInterval = null;
+    }
+
+    // 生成会话ID
+    generateSessionId() {
+        return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    // 记录页面访问
+    async trackPageView(page = window.location.pathname) {
+        try {
+            const response = await fetch(`${this.baseUrl}/pageview`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    page: page,
+                    sessionId: this.sessionId,
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator.userAgent,
+                    referrer: document.referrer
+                })
+            });
+            return await response.json();
+        } catch (error) {
+            console.warn('页面访问统计失败:', error);
+        }
+    }
+
+    // 开始在线用户心跳
+    startHeartbeat() {
+        this.sendHeartbeat(); // 立即发送一次
+        this.heartbeatInterval = setInterval(() => {
+            this.sendHeartbeat();
+        }, 30000); // 每30秒发送一次心跳
+    }
+
+    // 停止心跳
+    stopHeartbeat() {
+        if (this.heartbeatInterval) {
+            clearInterval(this.heartbeatInterval);
+            this.heartbeatInterval = null;
+        }
+        this.sendOffline();
+    }
+
+    // 发送心跳
+    async sendHeartbeat() {
+        try {
+            await fetch(`${this.baseUrl}/heartbeat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sessionId: this.sessionId,
+                    timestamp: new Date().toISOString()
+                })
+            });
+        } catch (error) {
+            console.warn('心跳发送失败:', error);
+        }
+    }
+
+    // 发送离线状态
+    async sendOffline() {
+        try {
+            await fetch(`${this.baseUrl}/offline`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sessionId: this.sessionId,
+                    timestamp: new Date().toISOString()
+                })
+            });
+        } catch (error) {
+            console.warn('离线状态发送失败:', error);
+        }
+    }
+
+    // 获取实时统计数据
+    async getStats() {
+        try {
+            const response = await fetch(`${this.baseUrl}/current`);
+            return await response.json();
+        } catch (error) {
+            console.warn('获取统计数据失败:', error);
+            return null;
+        }
+    }
+}
+
+// 导出统计API实例
+const statsAPI = new StatsAPI();
+
+// 页面加载时自动开始统计
+document.addEventListener('DOMContentLoaded', () => {
+    statsAPI.trackPageView();
+    statsAPI.startHeartbeat();
+});
+
+// 页面卸载时停止心跳
+window.addEventListener('beforeunload', () => {
+    statsAPI.stopHeartbeat();
+});
+
+// 页面可见性变化时的处理
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        statsAPI.stopHeartbeat();
+    } else {
+        statsAPI.startHeartbeat();
+    }
+});
+
+export default statsAPI;
