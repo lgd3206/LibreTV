@@ -705,27 +705,3 @@ class StatsAPI {
     }
 }
 
-// 导出统计API实例
-const statsAPI = new StatsAPI();
-
-// 页面加载时自动开始统计
-document.addEventListener('DOMContentLoaded', () => {
-    statsAPI.trackPageView();
-    statsAPI.startHeartbeat();
-});
-
-// 页面卸载时停止心跳
-window.addEventListener('beforeunload', () => {
-    statsAPI.stopHeartbeat();
-});
-
-// 页面可见性变化时的处理
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        statsAPI.stopHeartbeat();
-    } else {
-        statsAPI.startHeartbeat();
-    }
-});
-
-export default statsAPI;
