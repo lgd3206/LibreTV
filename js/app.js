@@ -1,5 +1,3 @@
-// 导入统计功能
-import { statsAPI } from './api.js';
 // 全局变量
 let selectedAPIs = JSON.parse(localStorage.getItem('selectedAPIs') || '["tyyszy","dyttzy", "bfzy", "ruyi"]'); // 默认选中资源
 let customAPIs = JSON.parse(localStorage.getItem('customAPIs') || '[]'); // 存储自定义API列表
@@ -42,11 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // 标记已初始化默认值
         localStorage.setItem('hasInitializedDefaults', 'true');
-    }
-// 启动统计功能
-    if (typeof statsAPI !== 'undefined') {
-        statsAPI.trackPageView();
-        statsAPI.startHeartbeat();
     }
     // 设置黄色内容过滤器开关初始状态
     const yellowFilterToggle = document.getElementById('yellowFilterToggle');
