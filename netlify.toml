@@ -28,3 +28,13 @@
 #   for = "/*"
 #   [headers.values]
 #     # Add any global headers here
+[build]
+  functions = "functions"
+
+[[redirects]]
+  from = "/api/v1/stats/*"
+  to = "/.netlify/functions/stats/:splat"
+  status = 200
+
+[functions]
+  node_bundler = "esbuild"
