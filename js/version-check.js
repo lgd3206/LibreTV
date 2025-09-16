@@ -141,14 +141,14 @@ function addVersionInfoToFooter() {
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                发现新版
+                发现新大陆
             </span>`;
             
             setTimeout(() => {
                 const updateBtn = versionElement.querySelector('span');
                 if (updateBtn) {
                     updateBtn.addEventListener('click', () => {
-                        window.open('https://github.com/LibreSpark/LibreTV', '_blank');
+                        window.open('https://www.ziyuanso.net', '_blank');
                     });
                 }
             }, 100);
